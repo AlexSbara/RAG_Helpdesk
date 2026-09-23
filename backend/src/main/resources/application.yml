@@ -1,0 +1,51 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: rag-helpdesk
+
+  mvc:
+    async:
+      # Le risposte in streaming (POST /api/chat/stream) restano aperte per tutta
+      # la generazione: allineato al timeout lato frontend (120 s). Senza questo
+      # valore varrebbe il default del container (30 s), troppo basso a freddo.
+      request-timeout: 120s
+
+  ai:
+    # Con due starter di modello nel classpath va dichiarato quale usare per cosa
+    model:
+      embedding: transformers   # embedding in-process (ONNX)
+      chat: ollama              # generazione con LLM locale
+
+    # --- Modello di embedding multilingue (in-JVM, nessuna chiamata esterna) ---
+    embedding:
+      transformer:
+        onnx:
+          model-uri: https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/onnx/model.onnx
+        tokenizer:
+          uri: https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2/resolve/main/tokenizer.json
+        # I file vengono scaricati una volta e messi in cache locale (~/.cache)
+
+    # --- Modello generativo locale ---
+    ollama:
+      base-url: http://localhost:11434
+
+# Parametri applicativi della pipeline RAG
+rag:
+  dataset-path: classpath:data/tickets_dataset.json
+  eval-path: classpath:data/eval_queries.json
+  top-k: 4
+  similarity-threshold: 0.50
+  vector-store-file: ./vector-store.json   # persistenza degli embedding tra i riavvii
+  generation:
+    model: gemma4:e4b
+    temperature: 0.2
+    context-window: 4096
+    max-output-tokens: 384
+    thinking-enabled: false
+    # Durata negativa = Ollama tiene il modello residente in memoria senza mai
+    # scaricarlo: elimina i cold start (~16-30 s di ricaricamento dopo 10 minuti
+    # di inattività con il precedente valore 10m). Il footprint runtime del
+    # modello è ~3,3 GB su GPU, quindi tenerlo residente non costa nulla.
+    keep-alive: -1m

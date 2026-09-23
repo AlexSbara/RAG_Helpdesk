@@ -1,0 +1,28 @@
+# Build Java/Maven
+backend/target/
+
+# Cache vettoriale generata dal backend
+backend/vector-store.json
+backend/vector-store.json.sha256
+
+# Dipendenze e build Angular
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+
+# Log locali
+*.log
+logs/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+.project
+.classpath
+.settings/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+Desktop.ini

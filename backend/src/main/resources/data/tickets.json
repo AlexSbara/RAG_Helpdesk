@@ -1,0 +1,102 @@
+[
+  {
+    "id": "TCK-001",
+    "categoria": "Account e autenticazione",
+    "titolo": "Password dimenticata portale aziendale",
+    "descrizione": "L'utente non riesce ad accedere al portale aziendale perché ha dimenticato la password e il link di recupero non arriva via email.",
+    "soluzione": "1) Verificare che l'indirizzo email in anagrafica sia corretto. 2) Controllare la cartella spam. 3) Se il problema persiste, reimpostare la password dall'Active Directory con l'opzione 'utente deve cambiare password al prossimo accesso'.",
+    "priorita": "media",
+    "tags": ["password", "recupero", "portale"],
+    "dataChiusura": "2025-09-12"
+  },
+  {
+    "id": "TCK-002",
+    "categoria": "Account e autenticazione",
+    "titolo": "Account bloccato dopo troppi tentativi",
+    "descrizione": "Dopo diversi tentativi di accesso falliti l'account di dominio risulta bloccato e l'utente non può usare nessun servizio aziendale.",
+    "soluzione": "1) Verificare l'identità dell'utente. 2) Sbloccare l'account da Active Directory Users and Computers. 3) Consigliare l'aggiornamento delle credenziali salvate su smartphone che causavano i tentativi falliti.",
+    "priorita": "alta",
+    "tags": ["account bloccato", "active directory"],
+    "dataChiusura": "2025-09-20"
+  },
+  {
+    "id": "TCK-003",
+    "categoria": "Rete e connettività",
+    "titolo": "Wi-Fi aziendale che si disconnette",
+    "descrizione": "Il notebook si disconnette dalla rete Wi-Fi aziendale ogni pochi minuti, soprattutto in sala riunioni.",
+    "soluzione": "1) Aggiornare il driver della scheda di rete. 2) Disattivare il risparmio energetico sulla scheda Wi-Fi. 3) Dimenticare la rete e riconnettersi con le credenziali di dominio.",
+    "priorita": "media",
+    "tags": ["wifi", "disconnessione", "driver"],
+    "dataChiusura": "2025-10-02"
+  },
+  {
+    "id": "TCK-004",
+    "categoria": "Rete e connettività",
+    "titolo": "VPN non si connette da remoto",
+    "descrizione": "In smart working il client VPN resta bloccato su 'connessione in corso' e va in timeout.",
+    "soluzione": "1) Verificare la connettività internet di base. 2) Aggiornare il client VPN all'ultima versione. 3) Cambiare il protocollo da UDP a TCP nelle impostazioni del client. 4) Se persiste, ricreare il profilo VPN.",
+    "priorita": "alta",
+    "tags": ["vpn", "smart working", "timeout"],
+    "dataChiusura": "2025-10-08"
+  },
+  {
+    "id": "TCK-005",
+    "categoria": "Email e collaborazione",
+    "titolo": "Casella di posta piena",
+    "descrizione": "L'utente non riceve più email: il server risponde che la casella ha superato la quota.",
+    "soluzione": "1) Svuotare la posta eliminata e la cartella spam. 2) Archiviare le email più vecchie di un anno in un archivio locale. 3) Se necessario, richiedere l'aumento temporaneo della quota.",
+    "priorita": "media",
+    "tags": ["email", "quota", "archiviazione"],
+    "dataChiusura": "2025-10-15"
+  },
+  {
+    "id": "TCK-006",
+    "categoria": "Hardware",
+    "titolo": "Stampante di rete non raggiungibile",
+    "descrizione": "Dal piano secondo nessun utente riesce a stampare: la stampante risulta offline sui client.",
+    "soluzione": "1) Riavviare la stampante e verificare l'indirizzo IP. 2) Verificare che l'IP non sia cambiato per DHCP e impostare una prenotazione. 3) Riavviare lo spooler di stampa sul print server.",
+    "priorita": "alta",
+    "tags": ["stampante", "rete", "spooler"],
+    "dataChiusura": "2025-10-21"
+  },
+  {
+    "id": "TCK-007",
+    "categoria": "Software e applicazioni",
+    "titolo": "Applicativo gestionale si chiude all'avvio",
+    "descrizione": "Il gestionale si chiude subito dopo il login mostrando per un attimo una finestra di errore.",
+    "soluzione": "1) Rinominare la cartella del profilo utente dell'applicativo per forzarne la rigenerazione. 2) Reinstallare il runtime richiesto. 3) Verificare che l'antivirus non metta in quarantena i moduli del gestionale ed eventualmente aggiungere un'esclusione.",
+    "priorita": "alta",
+    "tags": ["gestionale", "crash", "antivirus"],
+    "dataChiusura": "2025-11-03"
+  },
+  {
+    "id": "TCK-008",
+    "categoria": "Sicurezza",
+    "titolo": "Email di phishing segnalata",
+    "descrizione": "Un utente ha ricevuto un'email sospetta che chiede di confermare le credenziali aziendali tramite un link esterno.",
+    "soluzione": "1) Non cliccare il link e inoltrare l'email alla casella di sicurezza. 2) Bloccare il mittente e il dominio sul gateway di posta. 3) Se l'utente ha inserito le credenziali, forzare il cambio password immediato e verificare gli accessi recenti.",
+    "priorita": "critica",
+    "tags": ["phishing", "sicurezza", "credenziali"],
+    "dataChiusura": "2025-11-10"
+  },
+  {
+    "id": "TCK-009",
+    "categoria": "File e storage",
+    "titolo": "Cartella condivisa non accessibile",
+    "descrizione": "L'utente riceve 'accesso negato' aprendo una cartella condivisa di reparto a cui prima accedeva regolarmente.",
+    "soluzione": "1) Verificare l'appartenenza al gruppo di sicurezza corretto in Active Directory. 2) Riaggiungere l'utente al gruppo se rimosso per errore. 3) Far eseguire logout e login per aggiornare il token di gruppo.",
+    "priorita": "media",
+    "tags": ["cartella condivisa", "permessi", "gruppi"],
+    "dataChiusura": "2025-11-18"
+  },
+  {
+    "id": "TCK-010",
+    "categoria": "Prestazioni e sistema",
+    "titolo": "PC molto lento all'avvio",
+    "descrizione": "Il computer impiega diversi minuti ad arrivare al desktop e resta lento nei primi minuti di utilizzo.",
+    "soluzione": "1) Disabilitare i programmi non necessari in avvio automatico. 2) Verificare lo stato del disco e, se meccanico, proporre la sostituzione con SSD. 3) Eseguire una scansione antimalware completa.",
+    "priorita": "bassa",
+    "tags": ["lentezza", "avvio", "ssd"],
+    "dataChiusura": "2025-11-25"
+  }
+]

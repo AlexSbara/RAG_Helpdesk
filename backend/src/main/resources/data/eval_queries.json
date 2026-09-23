@@ -1,0 +1,34 @@
+[
+  {
+    "question": "La password del dominio è scaduta e non riesco più ad accedere al PC, come la cambio?",
+    "relevantTicketIds": ["T-1001"]
+  },
+  {
+    "question": "Il mio account di dominio è bloccato e non riesco ad accedere a nulla.",
+    "relevantTicketIds": ["T-1002"]
+  },
+  {
+    "question": "Da casa la VPN non si connette e mostra un errore di autenticazione.",
+    "relevantTicketIds": ["T-1006"]
+  },
+  {
+    "question": "Sul laptop non riesco a vedere la rete Wi-Fi aziendale tra quelle disponibili.",
+    "relevantTicketIds": ["T-1008"]
+  },
+  {
+    "question": "Non mi arrivano più le email: la casella di posta dice che lo spazio è esaurito.",
+    "relevantTicketIds": ["T-1012"]
+  },
+  {
+    "question": "Ho ricevuto una mail sospetta che mi chiede username e password: cosa devo fare?",
+    "relevantTicketIds": ["T-1026"]
+  },
+  {
+    "question": "Ricevo accesso negato quando provo ad aprire una cartella condivisa del reparto.",
+    "relevantTicketIds": ["T-1031"]
+  },
+  {
+    "question": "Il PC è molto lento all'avvio e impiega tanto tempo a diventare utilizzabile.",
+    "relevantTicketIds": ["T-1036"]
+  }
+]

@@ -1,0 +1,148 @@
+<div class="shell" [class.narrow]="narrow">
+  <aside class="sidebar" *ngIf="!narrow || sidebarOpen">
+    <div class="brand">
+      <div class="brand-name">Helpdesk<span>.</span></div>
+      <div class="brand-sub">Assistente ticket tecnici</div>
+    </div>
+
+    <div class="new-wrap">
+      <button type="button" class="btn btn-primary btn-block" (click)="newConversation()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
+        Nuova conversazione
+      </button>
+    </div>
+
+    <nav class="conv-list">
+      <div class="section-label conv-list-label">Conversazioni</div>
+      <button type="button" class="conv" *ngFor="let c of conversations"
+              [class.active]="c.id === activeId" (click)="selectConversation(c.id)">
+        <span class="conv-title">{{ c.title }}</span>
+        <span class="conv-meta">{{ conversationMeta(c) }}</span>
+      </button>
+    </nav>
+
+    <div class="status">
+      <div class="status-line"><span class="dot" [class.dot-down]="connection === 'down'" [class.dot-idle]="connection === 'unknown'"></span>{{ connectionLabel }}</div>
+      <div class="status-meta">top-k {{ topK }} · soglia {{ threshold }}</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <button type="button" class="btn btn-icon btn-secondary" *ngIf="narrow"
+              (click)="sidebarOpen = !sidebarOpen" aria-label="Mostra le conversazioni">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M4 6h16" /><path d="M4 12h16" /><path d="M4 18h16" /></svg>
+      </button>
+      <div class="topbar-title">{{ activeConversation.title }}</div>
+      <button type="button" class="btn btn-secondary" *ngIf="lastAnswer" (click)="copyAnswer()">{{ copied ? 'Copiata' : 'Copia risposta' }}</button>
+    </div>
+
+    <div class="thread">
+      <div class="intro" *ngIf="messages.length === 0">
+        <h1>Descrivi il problema.<br />Cerco nei ticket già risolti.</h1>
+        <p>Ogni risposta cita i ticket da cui viene, con il punteggio di similarità e i tempi di recupero e generazione. Parti da una delle domande di esempio o scrivi la tua.</p>
+      </div>
+
+      <ng-container *ngFor="let m of messages; let i = index">
+        <div class="turn-question" *ngIf="m.role === 'user'">
+          <div class="section-label">Domanda</div>
+          <div class="question">{{ m.text }}</div>
+        </div>
+
+        <div class="turn-answer" *ngIf="m.role === 'assistant'">
+          <div class="stages" *ngIf="m.response as r">
+            <div class="stage">
+              <span class="stage-label"><svg class="tick" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" /></svg>Cercato</span>
+              <span class="stage-value">{{ r.retrievalMillis }} ms</span>
+            </div>
+            <div class="stage">
+              <span class="stage-label"><svg class="tick" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" /></svg>Trovato</span>
+              <span class="stage-value">{{ r.sources.length }} pertinenti</span>
+            </div>
+            <div class="stage">
+              <span class="stage-label"><svg class="tick" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" /></svg>Scritto</span>
+              <span class="stage-value">{{ r.generationMillis / 1000 | number:'1.2-2' }} s</span>
+            </div>
+          </div>
+
+          <div class="answer"><ng-container *ngFor="let seg of segments(m)"><span *ngIf="!seg.citation">{{ seg.text }}</span><button type="button" class="cite" *ngIf="seg.citation" (click)="openSource(i, seg.citation - 1)" [title]="citationTitle(m, seg.citation)">{{ seg.citation }}</button></ng-container></div>
+
+          <div class="sources" *ngIf="m.response && m.response.sources.length > 0">
+            <div class="sources-head">
+              <h6>Ticket usati per la risposta</h6>
+              <span>ordinati per similarità</span>
+            </div>
+
+            <div class="source" *ngFor="let s of m.response.sources; let si = index"
+                 [class.open]="isOpen(i, si)" (click)="toggleSource(i, si)">
+              <span class="source-n" [class.muted]="!isCited(m, s)">{{ si + 1 }}</span>
+              <div class="source-body">
+                <div class="source-head">
+                  <span class="source-title" [class.muted]="!isCited(m, s)">{{ s.titolo }}</span>
+                  <span class="source-id">{{ s.id }}</span>
+                  <span class="source-note" *ngIf="!isCited(m, s)">recuperato, non citato</span>
+                </div>
+                <div class="source-detail" *ngIf="isOpen(i, si)">
+                  <div class="tags">
+                    <span class="tag tag-outline" *ngIf="s.categoria">{{ s.categoria }}</span>
+                    <span class="tag tag-accent" *ngIf="s.priorita">Priorità {{ s.priorita }}</span>
+                  </div>
+                  <p class="source-text" *ngIf="solutionOf(s)">{{ solutionOf(s) }}</p>
+                </div>
+              </div>
+              <div class="source-score">
+                <span class="score-label">similarità</span>
+                <span class="score-value" [class.muted]="!isCited(m, s)">{{ s.score | number:'1.2-2' }}</span>
+                <span class="bar"><span class="bar-fill" [class.muted]="!isCited(m, s)" [style.width.%]="s.score * 100"></span></span>
+              </div>
+            </div>
+
+            <div class="answer-foot">
+              <span class="timing">retrieval {{ m.response.retrievalMillis }} ms · generazione {{ m.response.generationMillis }} ms · top-k {{ topK }} · soglia {{ threshold }}</span>
+              <span class="spacer"></span>
+              <span class="section-label">{{ m.feedback ? (m.feedback === 'up' ? 'Segnata come utile' : 'Segnalata come non utile') : 'Risposta utile?' }}</span>
+              <button type="button" class="btn btn-secondary sm" [class.on]="m.feedback === 'up'" (click)="vote(m, 'up')">Sì</button>
+              <button type="button" class="btn btn-secondary sm" [class.on]="m.feedback === 'down'" (click)="vote(m, 'down')">No</button>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <div class="progress" *ngIf="loading">
+        <div class="progress-steps">
+          <span [class.done]="stage !== 'searching'">
+            <svg class="tick" viewBox="0 0 24 24" *ngIf="stage !== 'searching'"><path d="M20 6 9 17l-5-5" /></svg>
+            {{ stage === 'searching' ? 'cerco nei ticket...' : 'cercato · ' + pendingRetrievalMillis + ' ms' }}
+          </span>
+          <span class="done" *ngIf="stage !== 'searching'">
+            <svg class="tick" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" /></svg>
+            {{ pendingSources.length }} pertinenti
+          </span>
+          <span class="writing" *ngIf="stage === 'writing'">
+            sto scrivendo<i></i><i></i><i></i>
+          </span>
+        </div>
+        <div class="skeleton" *ngIf="!answerStarted">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+
+      <div class="error" *ngIf="error">{{ error }}</div>
+    </div>
+
+    <div class="composer">
+      <div class="suggestions">
+        <span class="section-label">Domande di esempio</span>
+        <button type="button" class="tag tag-outline" *ngFor="let s of suggestions" (click)="askSuggestion(s)">{{ s }}</button>
+      </div>
+      <form (ngSubmit)="send()">
+        <input class="input" [(ngModel)]="question" name="question"
+               placeholder="Descrivi il problema tecnico..." autocomplete="off" />
+        <button type="submit" class="btn btn-primary" [disabled]="loading || !question.trim()">
+          Invia
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
+        </button>
+      </form>
+    </div>
+  </main>
+</div>
